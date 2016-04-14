@@ -47,7 +47,9 @@ def extract(body, sender):
 
         body = body.strip()
 
+        # print body
         if has_signature(body, sender):
+            # print "has signature"
             lines = body.splitlines()
 
             markers = _mark_lines(lines, sender)
@@ -94,6 +96,7 @@ def _mark_lines(lines, sender):
             markers[j] = 'e'
         elif is_signature_line(line, sender, EXTRACTOR):
             markers[j] = 's'
+        # print line + " -> " + chr(markers[j])
 
     return markers
 
@@ -104,9 +107,13 @@ def _process_marked_lines(lines, markers):
     >>> _process_marked_lines(['Some text', '', 'Bob'], 'tes')
     (['Some text', ''], ['Bob'])
     """
+    # for i, line in enumerate(lines):
+    #     print line + " -> " + chr(markers[i])
     # reverse lines and match signature pattern for reversed lines
     signature = RE_REVERSE_SIGNATURE.match(markers[::-1])
+    # print signature.end()
     if signature:
+        # print "signature!"
         return (lines[:-signature.end()], lines[-signature.end():])
-
+    # print "no signature"
     return (lines, None)

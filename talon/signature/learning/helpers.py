@@ -31,9 +31,10 @@ RE_SEPARATOR = rc('^[\s]*---*[\s]*$')
 RE_SPECIAL_CHARS = rc(('^[\s]*([\*]|#|[\+]|[\^]|-|[\~]|[\&]|[\$]|_|[\!]|'
                        '[\/]|[\%]|[\:]|[\=]){10,}[\s]*$'))
 
-RE_SIGNATURE_WORDS = rc(('(T|t)hank.*,|(B|b)est|(R|r)egards|'
-                         '^sent[ ]{1}from[ ]{1}my[\s,!\w]*$|BR|(S|s)incerely|'
-                         '(C|c)orporation|Group'))
+RE_SIGNATURE_WORDS = rc(('^(C|c)heers,?$|^(F|f)rom,?$|^(T|t)hanks,?$|^(T|t)hank[ ]{1}you,?$|^(B|b)est,?$|^(R|r)egards,?$|'
+                         '^(S|s)ent[ ]{1}from[ ]{1}my[\s,!\w]*$|^BR,?$|^(S|s)incerely,?$|'
+                         '^(C|c)orporation$|^Group$'))
+# RE_SIGNATURE_WORDS = rc('^(S|s)sent[ ]{1}from[ ]{1}my[\s,!\w]*$'')
 
 # Taken from:
 # http://www.cs.cmu.edu/~vitor/papers/sigFilePaper_finalversion.pdf
@@ -208,18 +209,31 @@ def many_capitalized_words(s):
 def has_signature(body, sender):
     '''Checks if the body has signature. Returns True or False.'''
     non_empty = [line for line in body.splitlines() if line.strip()]
-    candidate = non_empty[-SIGNATURE_MAX_LINES:]
+    # print non_empty
+
+    # /* Note */
+    # commented out for now because we don't care about signature just want
+    # to remove it and any other text so removed the limit to signature size
+    # candidate = non_empty[-SIGNATURE_MAX_LINES:]
+    candidate = non_empty # Note: remove this if reinsert line above
+    # print candidate
     upvotes = 0
+    # print candidate
     for line in candidate:
         # we check lines for sender's name, phone, email and url,
         # those signature lines don't take more then 27 lines
+        # print line
         if len(line.strip()) > 27:
             continue
         elif contains_sender_names(sender)(line):
             return True
+        elif (binary_regex_search(RE_SIGNATURE_WORDS)(line) == 1):
+            # print "signature found"
+            return True
         elif (binary_regex_search(RE_RELAX_PHONE)(line) +
               binary_regex_search(RE_EMAIL)(line) +
-              binary_regex_search(RE_URL)(line) == 1):
+              binary_regex_search(RE_URL)(line)
+               == 1):
             upvotes += 1
     if upvotes > 1:
         return True
