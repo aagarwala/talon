@@ -31,9 +31,11 @@ RE_SEPARATOR = rc('^[\s]*---*[\s]*$')
 RE_SPECIAL_CHARS = rc(('^[\s]*([\*]|#|[\+]|[\^]|-|[\~]|[\&]|[\$]|_|[\!]|'
                        '[\/]|[\%]|[\:]|[\=]){10,}[\s]*$'))
 
-RE_SIGNATURE_WORDS = rc(('^(C|c)heers,?$|^(F|f)rom,?$|^(T|t)hanks,?$|^(T|t)hank[ ]{1}you,?$|^(B|b)est,?$|^(R|r)egards,?$|'
-                         '^(S|s)ent[ ]{1}from[ ]{1}my[\s,!\w]*$|^BR,?$|^(S|s)incerely,?$|'
-                         '^(C|c)orporation$|^Group$'))
+RE_SIGNATURE_WORDS = rc(('^(C|c)heers(,|!)?$|^(F|f)rom,?$|^(T|t)hanks(,|!)?$|^(T|t)hank[ ]{1}you(,|!)?$|'
+                         '^((M|m)y[ ]{1})?(B|b)est([ ]{1}(((W|w)ishes)|((R|r)egards)))?,?$|^((W|w)arm[ ]{1})?(R|r)egards,?$|'
+                         '^(S|s)ent[ ]{1}from[ ]{1}[\s,!\w.]*|'
+                         '^BR,?$|^(S|s)incerely,?$|^All[ ]{1}the[ ]{1}best,?$|^(S|s)ee[ ]{1}you(,|!)$|'
+                         '^(T|t)ake[ ]{1}care,?$'))
 # RE_SIGNATURE_WORDS = rc('^(S|s)sent[ ]{1}from[ ]{1}my[\s,!\w]*$'')
 
 # Taken from:
@@ -219,11 +221,12 @@ def has_signature(body, sender):
     # print candidate
     upvotes = 0
     # print candidate
-    for line in candidate:
+    for i, line in enumerate(candidate):
         # we check lines for sender's name, phone, email and url,
-        # those signature lines don't take more then 27 lines
+        # those signature lines don't take more then 27 (edited to 100) lines
         # print line
-        if len(line.strip()) > 27:
+        if len(line.strip()) > 100:
+            # print line + " => too long"
             continue
         elif contains_sender_names(sender)(line):
             return True
