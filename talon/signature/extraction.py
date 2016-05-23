@@ -44,7 +44,6 @@ def extract(body, sender):
     """
     try:
         delimiter = get_delimiter(body)
-
         body = body.strip()
 
         # print body
@@ -56,8 +55,15 @@ def extract(body, sender):
             text, signature = _process_marked_lines(lines, markers)
 
             if signature:
+                # print "GOT HERE"
                 text = delimiter.join(text)
+                # if the reply is empty (meaning whole body is signature)
+                # then return empty string as to not send chat
+                if not text:
+                    # print "~~~~~ reply was empty ~~~~~~~"
+                    return (text, None)
                 if text.strip():
+                    # print "~~~~~ reply had stripuff in it ~~~~~~~"
                     return (text, delimiter.join(signature))
     except Exception:
         log.exception('ERROR when extracting signature with classifiers')
@@ -87,6 +93,7 @@ def _mark_lines(lines, sender):
     # mark lines starting from bottom up
     # mark only lines that belong to candidate
     # no need to mark all lines of the message
+    # print candidate
     for i, line in reversed(list(enumerate(candidate))):
         # markers correspond to lines not candidate
         # so we need to recalculate our index to be
@@ -113,7 +120,10 @@ def _process_marked_lines(lines, markers):
     signature = RE_REVERSE_SIGNATURE.match(markers[::-1])
     # print signature.end()
     if signature:
-        # print "signature!"
+        # print "signature!~~~~~\n\n"
+        # print lines[:-signature.end()]
+        # print "\n reply[above]^ ---------- signature[below]\n"
+        # print lines[-signature.end():]
         return (lines[:-signature.end()], lines[-signature.end():])
     # print "no signature"
     return (lines, None)

@@ -35,7 +35,7 @@ RE_SIGNATURE_WORDS = rc(('^(C|c)heers(,|!)?$|^(F|f)rom,?$|^(T|t)hanks(,|!)?$|^(T
                          '^((M|m)y[ ]{1})?(B|b)est([ ]{1}(((W|w)ishes)|((R|r)egards)))?,?$|^((W|w)arm[ ]{1})?(R|r)egards,?$|'
                          '^(S|s)ent[ ]{1}from[ ]{1}[\s,!\w.]*|'
                          '^BR,?$|^(S|s)incerely,?$|^All[ ]{1}the[ ]{1}best,?$|^(S|s)ee[ ]{1}you(,|!)$|'
-                         '^(T|t)ake[ ]{1}care,?$'))
+                         '^(T|t)ake[ ]{1}care,?$|^##-.*-##$'))
 # RE_SIGNATURE_WORDS = rc('^(S|s)sent[ ]{1}from[ ]{1}my[\s,!\w]*$'')
 
 # Taken from:
@@ -225,7 +225,7 @@ def has_signature(body, sender):
         # we check lines for sender's name, phone, email and url,
         # those signature lines don't take more then 27 (edited to 100) lines
         # print line
-        if len(line.strip()) > 100:
+        if len(line.strip()) > 50:
             # print line + " => too long"
             continue
         elif contains_sender_names(sender)(line):
